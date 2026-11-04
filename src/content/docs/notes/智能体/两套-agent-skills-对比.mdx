@@ -1,0 +1,92 @@
+---
+title: 两套 Agent Skills 对比
+description: pstack 用 playbook 接管执行，Matt 用拷问和共享语言把控制权留给人；两者不在同一层。
+date: 2026-11-04
+tags: [AI, Agent, skills, 对比]
+status: growing
+sidebar:
+  order: 30
+---
+
+## 结论
+
+两套 skill 不在同一层。pstack 把一次任务写成可执行 playbook，Agent 拥有流程，用真实证据和并行保证交付；Matt 把工程判断拆成小 skill，人拥有流程，用拷问、共享语言和深度复杂模块保证方向。前者优化“做完且可信”，后者优化“做对且可控”。它们可以串联，但同时安装会在入口、追踪器和同名 skill 上撞车。
+
+## 结构差异
+
+| 维度 | pstack | Matt 的 skills | 含义 |
+|---|---|---|---|
+| 最小单位 | playbook（一次任务的完整流程） | skill（一种可复用纪律） | 一个描述“怎么做完”，一个描述“怎么判断” |
+| 流程所有权 | Agent | 人 | pstack 的入口会建 todo 并路由，Matt 的入口只做路由和拷问 |
+| 入口 | `poteto-mode`：复述、选 playbook、拷步骤 | `grill-me`：一句转发到 `grilling` | 一个重入口，一个薄入口 |
+| 状态载体 | todo、PR、证据链 | 设计树、`GLOSSARY.md`、ADR | 执行状态与决策状态分开 |
+| 调用方式 | 多数 skill 显式调用，由 mode 统一路由 | 明确分 user-invoked 与 model-invoked | Matt 的约束更显式，防止编排套娃 |
+| 并行 | 常态：`swarm`、`arena`、`autopilot` | 选择性：审查、research、`implement-spec` | 一个面向 Agent 群，一个面向人类节奏 |
+| 验证 | 真产物、逐单元、shipping 独立判定 | 预同意接缝的 TDD、双轴审查 | 一个防假绿，一个防误解 |
+| 典型失败 | slop、假绿、上下文溢出 | 误解、啰嗦、盲反馈循环、泥球 | 失败模式决定 skill 的形状 |
+| 移植性 | Cursor 原生，其他 harness 要映射 | 多 harness 插件 | pstack 的能力损失更明显 |
+| 使用成本 | 流程重、模型配置 | 人要持续在场 | 一个吃配置，一个吃注意力 |
+
+## 相同点
+
+两套东西在五个判断上高度一致。第一，都反对“能编译就算完成”：pstack 要求直接看真实产物，Matt 要求测试穿过公共接口。第二，都把验证放进主流程，不放到最后补。第三，都讨厌啰嗦：pstack 有 `unslop`，Matt 用 `GLOSSARY.md` 压缩表达。第四，都假设 Agent 会犯错，用结构兜住，不靠“请仔细一点”。第五，都以 `SKILL.md` 为分发单位，都能用 skills CLI 安装，都是实践者写的工程规范，没有对照实验。
+
+## 最大分歧：谁拥有流程
+
+pstack 的默认是 “Proceed, present the result, let the human course-correct.”：可逆的事先做，做完再让人纠正；不可逆的事——强推、部署、删数据、给客户发消息——才停下来。Matt 的默认是 “Interview the user relentlessly until you reach a shared understanding.”：没对齐之前不动手，事实由 Agent 查，决定由人做。
+
+表面看，一个激进，一个保守；其实它们管的是不同时刻。目标清楚、执行可逆时，阻塞的成本高于事后纠错，所以 pstack 先做；目标模糊、决定难撤回时，做错的工作比多问几轮更贵，所以 Matt 先问。真正的分歧不在“要不要问”，而在“谁拥有流程”：pstack 的 mode 拥有 todo、路由和验证，Agent 可以独立跑完一个长任务；Matt 的 user-invoked skill 保持很薄，人始终是索引，Agent 只提供纪律。这带来两种不同的风险：pstack 容易把小任务过度流程化，并把流程本身的 bug 藏进 mode；Matt 容易在人不参与时停摆，也不适合无人值守的长跑。
+
+## 组合方式
+
+可行的顺序是先用 Matt 定方向，再用 pstack 做交付：
+
+1. `grill-with-docs` 对齐需求，顺带产出 `GLOSSARY.md` 和 ADR。
+2. `to-spec` 把对话综合成规格，`to-tickets` 拆成带阻塞边的曳光弹。
+3. 用 pstack 的 `feature`、`bug fix` 或 `refactoring` playbook 执行。
+4. 用 pstack 的 `prove-it-works` 与 `sequence-verifiable-units` 做逐单元验证。
+5. 用 Matt 的 `code-review` 做 Standards 与 Spec 双轴审查。
+6. 用 pstack 的 `shipping` 逐 PR 取独立判定，自底向上合并。
+
+反过来也成立：把 pstack 的验证规则塞进 Matt 的 `implement`，或用 Matt 的 `GLOSSARY.md` 约束 pstack 的命名。关键是不要让两个入口同时拥有流程。
+
+## 不要组合
+
+- **两个入口同时开。** `poteto-mode` 和 `grill-me` 都会建流程、都会追问目标；同时开会产生两套 todo 和两个“下一步”。
+- **两个追踪器同时维护。** pstack 用 todo 和 PR，Matt 用追踪器工单；选一个作为单一事实源。
+- **同名 skill 都装。** 两边都有 `tdd`、`prototype`、`code-review`、`research` 一类 skill，触发条件重叠，Agent 会随机选一个。
+- **全局安装两套。** skill 名冲突时，触发行为取决于加载顺序；按仓库或按项目装更稳。
+
+## 选择
+
+| 处境 | 选择 | 理由 |
+|---|---|---|
+| 需求还没说清 | Matt 的 `grilling` | 先避免做错 |
+| 接手陌生代码库 | Matt 的 `codebase-design`、`improve-codebase-architecture` | 先建共享语言和结构地图 |
+| 需求清楚，任务长 | pstack | playbook、逐单元验证、可续跑 |
+| 要并行开多个 PR | pstack | `swarm`、`autopilot`、上下文分层 |
+| 偶发 bug 或性能回归 | pstack 的 bug fix / perf | 运行时证据和二分 |
+| 跨会话大目标 | Matt 的 `wayfinder` 或 pstack 的 autonomous run | 一个偏规划，一个偏执行 |
+| 只改一行 | 都不用 | 流程成本高于收益 |
+
+## 判断
+
+以下是我的判断，不是仓库原文。这个仓库是笔记库，不是代码库，所以我暂时不装任何一套，只借规则。从 pstack 借四条：对真实产物验证、把工作切成可验证的小单元、可逆的事不阻塞、报告数字前先解释数字。从 Matt 借四条：模糊时先拷问、给项目建 `GLOSSARY.md`、测试写在公共接缝上、写文档给 Agent 看时区分常驻信息和按需信息。理由是完整流程需要测试、追踪器、PR 栈和模型配置，而这些在笔记库里都不存在，装了只会增加维护面。
+
+## 风险与盲点
+
+- **证据等级低。** 两套都是实践者的工程规范，没有对照实验；star 数只说明关注度，pstack 约 3.5k、Matt 约 312k（截至 2026-11-04）。
+- **模型依赖强。** 长 `SKILL.md` 在弱模型上可能被忽略，subagent 和并行能力也不是每个 harness 都有。
+- **假设反馈循环存在。** 没有测试、没有可运行产物时，TDD、prove-it-works、shipping 判定都会空转。
+- **流程成本真实。** pstack 的前置动作多，Matt 的拷问需要人持续回答；两者都可能把一个下午的活拖成一天的会议。
+- **移植损失不同。** pstack 的 Cursor 专属能力换 harness 后会缺失；Matt 的 skill 更可移植，但依赖人的判断，不能全自动。
+
+## 事实源
+
+仓库原文（✅）：[pstack README](https://github.com/backnotprop/pstack)（commit `ecec42ad`，2026-11-03）、[`poteto-mode`](https://github.com/backnotprop/pstack/blob/ecec42adbe4f240e4ae19d296768445f0dfbd38e/skills/poteto-mode/SKILL.md)、[Matt skills README](https://github.com/mattpocock/skills)（commit `4ae2317d`，2026-10-31）、[`grilling`](https://github.com/mattpocock/skills/blob/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/productivity/grilling/SKILL.md)、[`domain-modeling`](https://github.com/mattpocock/skills/blob/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/engineering/domain-modeling/SKILL.md)。引语逐字来自上述文件；标 `判断` 的段落是我的比较。这是工具笔记，不做研究证据分级。
+
+## 相关
+
+- [pstack](/notes/智能体/pstack)
+- [Matt Pocock 的 skills](/notes/智能体/matt-skills)
+- [智能体总览](/notes/智能体)

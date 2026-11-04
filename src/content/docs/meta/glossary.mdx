@@ -1,0 +1,139 @@
+---
+title: 术语与译名表
+description: 英文技术词的处理规则和对照表：哪些保留原文，哪些翻译，首次出现怎么写。
+date: 2026-11-04
+tags: [术语, 翻译, 写作]
+status: growing
+sidebar:
+  order: 25
+---
+
+## 用法
+
+先查表；表里没有的，按下面的规则判断。词条第一次出现写成“中文（English）”或“English（中文解释）”，之后只用一个形式。用户指定的译名优先于通行译法，表里标“用户指定”的行不自行改回。
+
+## 规则
+
+| 类别 | 处理 | 例子 |
+|---|---|---|
+| 产品名、仓库名、文件名、命令、代码标识符 | 不译 | `poteto-mode`、`GLOSSARY.md`、`npx skills add` |
+| AI 生态词 | 不译 | Agent、subagent、harness |
+| 行业里以英文为主的流程名 | 不译，首次加一句解释 | skill、playbook |
+| 中文有稳定译法的通用概念 | 译 | feedback loop → 反馈循环 |
+| 多种译名、容易误解的概念 | 按用户指定，首次中英并列 | deep module → 深度复杂模块 |
+| 本表未收的词 | 先保留英文，首次加一句解释 | — |
+
+## 不译
+
+| English | 说明 |
+|---|---|
+| Agent | AI 执行者；指具体产品时按官方写法 |
+| subagent | “子代理”只用于解释 |
+| harness | agent harness 的简称；不译，首次可注“Agent 运行环境” |
+| worktree | git worktree 的专名；不译 |
+| skill / skills | 指 SKILL.md、skills CLI 或技能包 |
+| playbook | 首次写“playbook（预设流程）” |
+| PR | pull request |
+| TODO | 代码与任务项 |
+| `poteto-mode`、`comment-sicko`、`grilling`、`tdd` | 技能名与标识符 |
+
+## 译
+
+| English | 中文 | 依据 |
+|---|---|---|
+| feedback loop | 反馈循环 | 用户指定 |
+| deep module | 深度复杂模块 | 用户指定 |
+| frontier | 前沿 | 用户指定 |
+| shared language | 共享语言 | 通行 |
+| design tree | 设计树 | 通行 |
+| vertical slice | 纵向切片 | 通行 |
+| tracer bullet | 曳光弹 | 通行 |
+| blocking edge | 阻塞边 | 本库 |
+| tracker | 追踪器 | 通行 |
+| spec | 规格 | 通行 |
+| ticket | 工单 | 通行 |
+| review | 审查 | 通行 |
+| verdict | 判定 | 本库 |
+| anti-pattern | 反模式 | 通行 |
+| failure mode | 失败模式 | 通行 |
+| entry point | 入口 | 通行 |
+| mode | 模式 | 通行 |
+| router | 路由 | 通行 |
+| grilling | 拷问 | 本库；技能名 `grilling` 保留 |
+| principle | 原则 | 通行；指文件时写 `principle` |
+| context pointer | 上下文指针 | 通行 |
+| context load | 上下文负载 | 本库 |
+| cognitive load | 认知负荷 | 通行 |
+| seam | 接缝 | 通行 |
+| adapter | 适配器 | 通行 |
+| leverage | 杠杆 | 通行 |
+| locality | 局部性 | 通行 |
+| deletion test | 删除测试 | 本库 |
+| red-green | 红绿 | 通行 |
+| expand–contract | 扩展—收缩 | 通行 |
+| code review | 代码审查 | 通行 |
+
+## 阿里：没有公开的中文对照表
+
+- 阿里云术语库：`https://developer.aliyun.com/group/alibabacloudterm`，页面自述“提供术语的标准定义、缩略语、术语用法及多语言等”。
+- 公开形态是社区小组的文章流，按领域发布“必知词汇”词条，覆盖 Linux、数据库、云原生、微服务、Java、Python、前端、k8s。
+- 词条有中文释义和英文全称，例：`操作系统（Operating system，OS）`。
+- 没有中英对照表、导出文件或版本号；正文是科普长文，附参考资料。
+- 2018 Alibaba Style Guide 只有英文版，面向印尼语，没有中文版。
+- 结论：阿里侧没有可直接引用的中文术语规范。本表不把词条文章当依据。
+
+## 华为 / OpenHarmony：有中文规范
+
+- 《OpenHarmony 开发者文档风格指南》：中文原文，分【规则】和【建议】两级。
+- 术语表：`zh-cn/glossary.md`，按字母排列，条目形如 `ArkCompiler；方舟编译器`。
+- 三条术语规则，逐字引用：
+
+> 术语/缩略语名称要同“OpenHarmony术语表”保持一致，且全文统一。
+
+> 对于“OpenHarmony术语表”中未涵盖的行业通用术语/缩略语（如IP，MAC等），要同国际、国家、行业标准中的名称保持一致。
+
+> 禁止随意缩写英文单词，自创缩略语。
+
+- 术语名写法：`英文全称 (缩略语)；中文全称`。
+- LiteOS《文档写作规范》：“可以优先使用中文，建议中英文都支持……保证中英文的同步”；建议标题层级不超过三级。
+
+## 蚂蚁 / Ant Design：有界面文案规则
+
+- 文案页为中文，有明确对照表：其他/其它、抱歉/对不起、验证码/校验码、登录/登陆、此/该。
+- 称呼：用“你”“我”，不用“您”；同一句不混用。
+- 局限：管界面文案，不覆盖技术文档和翻译。
+
+## 本库采用的中文用词
+
+| 用 | 不用 | 来源 |
+|---|---|---|
+| 登录 | 登陆 | OpenHarmony、Ant Design |
+| 其他 | 其它 | Ant Design |
+| 阈值 | 阀值 | OpenHarmony |
+| 图像 | 图象 | OpenHarmony |
+| 命令 | 指令 | OpenHarmony |
+
+## 没找到的
+
+- 腾讯、字节跳动、美团：没有可核验的公开翻译规范或写作规范。搜到的只有文库、招聘、转载，不能引用。
+- 这只说明本次检索的边界，不能推断这些公司内部没有规范。
+
+## 本表的依据
+
+仍是三类：用户指定、通行译法、本库约定。国内厂商的公开规范只作旁证；只有用户指定能覆盖通行译法。拿到阿里的内部基准后，再加一列逐条对照，不凭印象补。
+
+## 来源
+
+- 阿里云术语库：`https://developer.aliyun.com/group/alibabacloudterm`
+- 阿里词条合集：`https://developer.aliyun.com/article/746093`
+- 阿里词条例：`https://developer.aliyun.com/article/745973`
+- OpenHarmony 语言风格：`https://gitcode.com/openharmony/docs/blob/master/zh-cn/contribute/style-guide/style-guide-language-style.md`
+- OpenHarmony 内容元素：`https://gitcode.com/openharmony/docs/blob/master/zh-cn/contribute/style-guide/style-guide-content-elements.md`
+- OpenHarmony 术语表：`https://gitcode.com/openharmony/docs/blob/master/zh-cn/glossary.md`
+- LiteOS 文档写作规范：`https://gitee.com/LiteOS/LiteOS/raw/master/doc/LiteOS_Contribute_Guide.md`
+- Ant Design 文案：`https://ant.design/docs/spec/copywriting-cn`
+
+## 相关
+
+- [写作与整理规范](/meta/conventions)
+- [证据页](/meta/evidence)

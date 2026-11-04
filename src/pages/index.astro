@@ -1,0 +1,17 @@
+---
+// 没有单独的首页：根路径直接去笔记。
+// 用完整 HTML 页面而不是裸 meta refresh，避免构建工具报“缺少 <html>”。
+---
+
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="refresh" content="0; url=/notes" />
+    <link rel="canonical" href="/notes" />
+    <meta name="robots" content="noindex" />
+    <title>前往笔记</title>
+  </head>
+  <body data-pagefind-ignore>
+    <p><a href="/notes">前往笔记</a></p>
+  </body>
+</html>

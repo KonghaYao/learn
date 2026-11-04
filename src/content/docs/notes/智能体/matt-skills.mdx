@@ -1,0 +1,100 @@
+---
+title: Matt Pocock 的 skills
+description: 39 个小 skill，按调用方式分层；用拷问、共享语言、反馈循环和深度复杂模块把工程判断变成可重复动作。
+date: 2026-11-04
+tags: [AI, Agent, skills, 工程]
+status: growing
+sidebar:
+  order: 20
+---
+
+## 定位
+
+Matt Pocock 的 skills 是一组以“可组合”为第一约束的 engineering skills：每个 skill 小、可改、可配合任意模型，目标是把工程基本功变成可重复动作，框架不接管流程。README 直接点名 GSD、BMAD、Spec-Kit 的问题——它们试图 “owning the process”，结果夺走控制权，并让流程本身的 bug 难以定位。作者的主张是 “Developing real applications is hard”，所以 skill 只提供纪律，不替人做决定；仓库 MIT，截至 2026-10-31（commit `4ae2317d`）有 39 个 `SKILL.md`，分 engineering、productivity、in-progress、misc 四组。
+
+## 组织：按调用方式分层
+
+skill 只按一个轴分类：谁能 invoke。
+
+- **user-invoked**：只能由用户输入触发，职责是编排；例：`grill-me`、`grill-with-docs`、`to-spec`、`to-tickets`、`implement`、`implement-spec`、`wayfinder`、`triage`、`retro`、`improve-codebase-architecture`。
+- **model-invoked**：用户或 Agent 都能触发，承载可复用的纪律；例：`grilling`、`tdd`、`diagnosing-bugs`、`domain-modeling`、`codebase-design`、`code-review`、`prototype`、`research`、`writing-for-agents`。
+- **约束**：user-invoked 可以调用 model-invoked，但不得调用另一个 user-invoked；入口因此保持很薄，`grill-me` 全文只有一行 `Call the Skill tool with "grilling".`，`grill-with-docs` 也只调用 `grilling` 与 `domain-modeling` 两个原语。
+
+这套分层解决的是编排套娃：流程入口不互相调用，原语可以被任意入口复用，新增流程时不需要改其他入口。
+
+## 四个失败模式
+
+| 失败模式 | 根因 | 对应 skill | 机制 |
+|---|---|---|---|
+| Agent 没做对 | 沟通缺口 | `grill-me`、`grill-with-docs` | 按设计树逐轮提问，直到前沿为空 |
+| Agent 话太多 | 缺少共享语言 | `domain-modeling`、`GLOSSARY.md` | 一个术语替代一长串解释，变量与文件名同源 |
+| 代码不工作 | 反馈循环缺失 | `tdd`、`diagnosing-bugs` | 先造能变红的信号，再改代码 |
+| 代码变泥球 | 设计缺位 | `codebase-design`、`improve-codebase-architecture` | 深度复杂模块、接缝、删除测试；先调查再重构 |
+
+四层顺序不能颠倒：需求没对齐时写测试，只会把误解固化；没有反馈循环时谈设计，只会得到纸面架构。
+
+## 对齐：grilling
+
+`grilling` 把讨论组织成一棵设计树：每个决定是一个节点，依赖它的决定是子节点；每一轮只问前沿上的问题，也就是前置条件已经确定、现在就能回答的问题。问题格式固定——编号、给选项、附推荐答案，用户可以直接答“是”，也可以改；一轮结束后重新计算前沿，直到满足原文的完成条件：“The session is done when the frontier is empty: every branch of the design tree visited, nothing left silently assumed.”
+
+分工写得很硬：“Finding *facts* is your job, never the user's.” 事实由 Agent 查，需要外部信息时派一个全新上下文的 subagent 去查，不阻塞其他分支；决定由用户做，Agent 不得替用户拍板。`grill-with-docs` 在拷问的同时维护 `GLOSSARY.md` 和 `docs/adr/`：术语第一次被命名时写入 `GLOSSARY.md`，决定满足“难以撤回、没有背景会看不懂、确实权衡过多个方案”三个条件时才写 ADR，避免把每个讨论都变成文档。
+
+## 共享语言：GLOSSARY 与 ADR
+
+README 用一个例子说明收益：改前是“一门课里的一节课被‘变成真的’时有问题”，改后是 “materialization cascade 有问题”；术语变短，含义变准，每次会话都省 token。`GLOSSARY.md` 只放领域术语，不放实现细节，也不当草稿纸；变量名、函数名、文件名应尽量与 GLOSSARY 一致。ADR 记录的是“为什么选这个方案”，架构调查时先读 ADR，避免重复提出已被否决的方案。
+
+## 反馈循环：TDD 与诊断
+
+`tdd` 的第一条规则是 “Tests verify behavior through public interfaces, not implementation details.”，测试只写在双方预先同意的接缝上；接缝指不用改这里就能改行为的位置。它列了三个反模式：绑实现（重构就坏，行为没变）、同义反复（用代码同样的算法算期望值）、横切（先写一堆测试再写实现）。正确做法是竖切——一个测试、一个实现、下一个测试；红灯在前，绿灯在后；重构不算红绿循环的一部分，放到审查。
+
+`diagnosing-bugs` 把“造反馈循环”当成 skill 本身：先找到一个能在这个 bug 上变红的紧凑循环，再谈假设；手段按顺序从失败测试、curl、CLI、无头浏览器、回放 trace、一次性 harness、属性/模糊测试、二分、差分，一直到人工脚本。循环要快、要确定：30 秒的不稳定循环几乎等于没有，2 秒的确定性循环才算紧凑，才谈得上调试效率；非确定 bug 追求更高的复现率，干净复现可以放弃。造不出循环就停下，列出尝试过的办法，向用户要环境、要脱敏后的产物，或要临时埋点许可，不得在没有循环的情况下进入假设阶段。后续阶段依次是最小化复现、排序 3–5 个假设、埋点验证、修复、补回归测试。
+
+## 设计：深度复杂模块与架构调查
+
+`codebase-design` 规定一套固定词汇，禁止漂移到 `component`、`service`、`API`、`boundary` 这些词：模块（有接口和实现的任何东西）、接口（调用者必须知道的一切）、深度（每单位接口换来的行为）、接缝（不用改这里就能改行为的位置）、适配器、杠杆（调用者得到的回报）、局部性（维护者得到的集中）。深度复杂模块是小接口加大行为；判断浅模块用删除测试——删掉它，复杂度是集中了还是只是搬家，集中才是信号；“接口就是测试面”；“一个适配器是假接缝，两个才是真接缝”。
+
+`improve-codebase-architecture` 先定范围再扫描：用户给了方向就照做，否则用 `git log --oneline` 找热点，把注意力放在最近改动多的区域；然后派全新上下文的 subagent 有机地走代码库，找“理解一个概念要在多个小模块间跳”“接口和实现一样复杂”“纯函数被抽出来只为测试、真实 bug 藏在调用处”这类摩擦。候选写成自包含 HTML 报告，每张卡带文件、问题、方案、收益、前后对比图和推荐强度，结尾给一个首选；此时不得提出接口。用户选中后再进入 `grilling`，命名、约束、依赖、接缝后的东西和存活测试逐项定；新术语写进 `GLOSSARY.md`，被否决且有分量的理由写成 ADR。README 特意说明它是 “a survey, not a rescue: on a genuinely old codebase it will find real candidates, but it won't untangle the mud for you.”
+
+## 交付链：规格 → 工单 → implement
+
+- `to-spec` 跳过重新访谈，直接把当前对话综合成规格，写到仓库已有的 `specs/` 约定位置；写之前先测验用户涉及哪些模块。
+- `to-tickets` 把计划拆成曳光弹：每个切片切穿 schema、API、UI、测试，能独立演示，能放进一个全新上下文；每个工单声明阻塞边，没有阻塞边的工单立即可做。宽重构是例外，按扩展—收缩排序：先加新形式、再分批迁移、最后删旧形式，必要时共享集成分支，只在最终验证工单上承诺全绿。拆完先让用户确认粒度与阻塞边，再按依赖顺序发布到本地 `.scratch/` 或真实追踪器。
+- `implement` 按已同意的接缝写 TDD，频繁跑类型检查和测试，结束后走 `code-review`。
+- `implement-spec` 建一条集成分支，把任务图并行铺开，只调度阻塞边已完成的工单；`wayfinder` 负责跨会话的大目标。
+- `code-review` 分两个轴并行跑 subagent：Standards 查仓库规范，Spec 查是否忠实实现原需求；两轴分开，避免互相污染。
+
+## 写给 Agent 的文档
+
+`writing-for-agents` 是元 skill，适用于任何 Agent 会读的文档：`SKILL.md`、`AGENTS.md`、`CLAUDE.md`，以及被指针引到的文档。核心概念是上下文指针（放在上下文里、指向外部材料并写明何时去读的引用）、上下文负载（常驻上下文占用的注意力和 token）与认知负荷（人记住“有哪些文档、何时用”的负担）。信息分三层：文件内步骤、文件内参考、指针后的按需材料；能晚加载的就晚加载，能放在使用处的就别集中到远处。指针的措辞决定触发准确率，常驻的每个字都要按“每一轮都付费”来算；“The human is the index.”
+
+## 代价与边界
+
+- **需要人持续在场。** 拷问不能全自动，`to-tickets` 也要用户确认粒度；没有参与，skill 退化成普通提示词。
+- **假设基础设施存在。** 反馈循环依赖测试、可运行环境和追踪器；`GLOSSARY.md`、ADR 需要先建，`/setup-matt-pocock-skills` 还要配置追踪器和 triage 标签。
+- **仍在变化。** 39 个 skill 含 `in-progress` 组，接口和行为可能改。
+- **证据等级低。** 这是实践者经验，没有对照实验；312k stars 只说明关注度。
+- **不是无人值守方案。** 它优化的是“做对且可控”，不是“人不在也能跑完”。
+
+## 任务路由
+
+| 处境 | skill | 产出 |
+|---|---|---|
+| 需求模糊 | `grill-me` | 对齐后的设计树 |
+| 需求模糊且要落文档 | `grill-with-docs` | 决定 + `GLOSSARY.md` + ADR |
+| 硬 bug 或性能回归 | `diagnosing-bugs` | 先有能变红的循环，再修复与回归测试 |
+| 代码变泥球 | `improve-codebase-architecture` | 候选报告，选中后进入 `grilling` |
+| 大改动的规格 | `to-spec` | 写到 `specs/` 的规格 |
+| 规格拆任务 | `to-tickets` | 带阻塞边的曳光弹 |
+| 多工单并行 | `implement-spec` | 集成分支 + 任务图 |
+| 跨会话目标 | `wayfinder` | 可续跑的大任务 |
+| 交接 | `handoff` | 给下一个会话的上下文 |
+
+## 事实源
+
+以下内容读自仓库原文（✅）：[README](https://github.com/mattpocock/skills)、[`grilling`](https://github.com/mattpocock/skills/blob/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/productivity/grilling/SKILL.md)、[`tdd`](https://github.com/mattpocock/skills/blob/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/engineering/tdd/SKILL.md)、[`diagnosing-bugs`](https://github.com/mattpocock/skills/blob/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/engineering/diagnosing-bugs/SKILL.md)、[`domain-modeling`](https://github.com/mattpocock/skills/blob/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/engineering/domain-modeling/SKILL.md)、[`codebase-design`](https://github.com/mattpocock/skills/blob/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/engineering/codebase-design/SKILL.md)、[`to-tickets`](https://github.com/mattpocock/skills/blob/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/engineering/to-tickets/SKILL.md)、[`improve-codebase-architecture`](https://github.com/mattpocock/skills/blob/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/engineering/improve-codebase-architecture/SKILL.md)、[`writing-for-agents`](https://github.com/mattpocock/skills/blob/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/productivity/writing-for-agents/SKILL.md)。引语逐字来自上述文件；star 数截至 2026-11-04。这是工具笔记，不做研究证据分级。
+
+## 相关
+
+- [pstack](/notes/智能体/pstack)
+- [两套 Agent Skills 对比](/notes/智能体/两套-agent-skills-对比)
+- [智能体总览](/notes/智能体)

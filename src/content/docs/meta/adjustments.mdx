@@ -1,0 +1,64 @@
+---
+title: 调整记录
+description: 用户每次改变规则、结构或偏好时，在这里追加一行。
+date: 2026-11-04
+tags: [规范, 记录]
+status: evergreen
+sidebar:
+  order: 30
+---
+
+## 怎么记
+
+每次调整追加一行，不覆盖旧记录。
+
+格式：
+
+| 日期 | 调整 | 原因 | 影响 |
+|---|---|---|---|
+| YYYY-MM-DD | 一句话 | 为什么改 | 哪些文件或目录 |
+
+## 记录
+
+| 日期 | 调整 | 原因 | 影响 |
+|---|---|---|---|
+| 2026-11-04 | 初始化学习库 | 开始积累学习内容 | 全部 |
+| 2026-11-04 | 用 Nimbus 展示文档 | 用户提供了 Cloudflare Nimbus | `astro.config.ts`、`src/content/docs/` |
+| 2026-11-04 | 笔记格式用 MDX | Nimbus 支持 MDX，用户可直接阅读 | `src/content/docs/`、`templates/` |
+| 2026-11-04 | 主题目录按需创建 | 避免空目录 | `src/content/docs/notes/` |
+| 2026-11-04 | 暂不做复习机制 | 先专注记录 | `CLAUDE.md`、首页 |
+| 2026-11-04 | 使用 Git | 可追溯变化 | `.gitignore` |
+| 2026-11-04 | 工作区与发布区分开 | 草稿不发布，整理后再进站点 | `inbox/`、`src/content/docs/` |
+| 2026-11-04 | 阅读障碍友好的写作规则 | 用户有阅读障碍 | `CLAUDE.md`、`meta/conventions.mdx` |
+| 2026-11-04 | 用户消息默认视为学习素材 | 用户明确说明 | `CLAUDE.md` |
+| 2026-11-04 | AI 主动启动、编写、整理 | 用户明确要求 | `CLAUDE.md`、`README.md`、首页、`meta/conventions.mdx` |
+| 2026-11-04 | 顶栏增加领域跳转 | 用户要求分割不同领域 | `astro.config.ts`、`src/components/Header.astro` |
+| 2026-11-04 | 写作与整理规范改为证据导向 | 用户要求参考论文并尊重原文 | `meta/conventions.mdx`、`meta/evidence.mdx`、`CLAUDE.md` |
+| 2026-11-04 | 移除首页与来源 | 用户要求简化顶栏和内容 | `src/content/docs/index.mdx`、`src/content/docs/sources/`、`templates/source.mdx` |
+| 2026-11-04 | 新增文风规范（证据导向） | 用户要求调查文风 | `meta/conventions.mdx`、`meta/evidence.mdx`、`CLAUDE.md` |
+| 2026-11-04 | 新增“智能体”主题 | 用户指定学习 pstack 与 Matt skills | `notes/智能体/`、`notes/index.mdx` |
+| 2026-11-04 | 分析文改用技术简报 | 用户厌恶低信息密度、碎片语法和模板结构 | `CLAUDE.md`、`notes/智能体/` 三篇 |
+| 2026-11-04 | 禁用“不是 X，而是 Y”句式 | 用户认为该句式观感差 | `CLAUDE.md`、`meta/conventions.mdx`、`notes/智能体/` 三篇 |
+| 2026-11-04 | 专有名词按术语表处理 | 用户要求区分译与不译，不要一律英文 | `CLAUDE.md`、`meta/conventions.mdx`、`meta/glossary.mdx`、`notes/智能体/` 三篇 |
+| 2026-11-04 | 新增术语与译名表 | 用户要求单独文件，并修正 feedback loop、deep module、frontier 的译名 | `meta/glossary.mdx`、`meta/conventions.mdx`、`CLAUDE.md`、`notes/智能体/` 三篇 |
+| 2026-11-04 | harness 不译 | 用户指出 harness 是 agent harness 的简称 | `meta/glossary.mdx`、`notes/智能体/` 三篇 |
+| 2026-11-04 | worktree 不译 | 用户指出特指 git worktree | `meta/glossary.mdx`、`CLAUDE.md`、`meta/conventions.mdx` |
+| 2026-11-04 | 采用 Alibaba Style Guide 作基础风格指南 | 用户指定 | `meta/style-base.mdx`、`meta/conventions.mdx`、`meta/index.mdx`、`CLAUDE.md` |
+| 2026-11-04 | 补查国内厂商规范 | 用户追问阿里术语表有无中文版，并要求继续检索 | `meta/style-base.mdx`、`meta/glossary.mdx` |
+
+## 当前工作方式
+
+- 用户提供方向、纠正和确认。
+- AI 启动、写、整理。
+- 发布、部署、Git 提交需要用户明确同意。
+
+## 待确认
+
+- 正式域名。
+- 是否部署到 Cloudflare。
+- 是否以后接入评论、搜索或 MCP。
+
+## 相关
+
+- [Cloudflare Nimbus](https://github.com/cloudflare/nimbus)
+- [写作与整理规范](/meta/conventions)

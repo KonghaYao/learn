@@ -1,0 +1,166 @@
+---
+import Logo from "./Logo.astro";
+import type { SidebarSection } from "@cloudflare/nimbus-docs/types";
+import Icon from "@cloudflare/nimbus-docs/components/Icon.astro";
+import { Button } from "./ui/button";
+import { LinkButton } from "./ui/link-button";
+import { ThemeToggle } from "./ui/theme-toggle";
+import SearchTrigger from "./ui/search/SearchTrigger.astro";
+import { config } from "virtual:nimbus/config";
+import { stripBase, withBase } from "@cloudflare/nimbus-docs/runtime";
+import fs from "node:fs";
+import path from "node:path";
+
+interface Props {
+  /** Astro collection id for the current page, forwarded from DocsLayout. */
+  collection?: string;
+  /** Astro entry id for the current page, forwarded from DocsLayout. */
+  entryId?: string;
+  /**
+   * Whether the page has a sidebar to open. When `false`, the mobile
+   * menu button is hidden — pages that opted out via `sidebar: false`
+   * shouldn't show a button that opens an empty dialog. Default `true`.
+   */
+  showSidebar?: boolean;
+  sections?: SidebarSection[];
+}
+
+// `entryId` is part of Props as a forward-compat hook (the version-switcher
+// recipe reads it) but the base Header doesn't use it — leave it off the
+// destructure to avoid an unused-var warning.
+const { showSidebar = true } = Astro.props;
+
+// Normalize trailing slash so isActive matches sidebar hrefs.
+// Decode because Astro exposes non-ASCII paths percent-encoded.
+const currentSlug =
+  decodeURIComponent(
+    stripBase(Astro.url.pathname, import.meta.env.BASE_URL),
+  ).replace(/\/$/, "") || "/";
+
+// Top navigation for the learning areas.
+// Nimbus's built-in tabs only appear for separate collections; this site
+// uses one docs collection, so the tabs are defined here.
+// Domain tabs are read from notes/<domain>/index.mdx, so new domains
+// appear automatically when they are created.
+const notesRoot = path.join(process.cwd(), "src/content/docs/notes");
+const domainTabs = fs.existsSync(notesRoot)
+  ? fs
+      .readdirSync(notesRoot, { withFileTypes: true })
+      .filter(
+        (entry) =>
+          entry.isDirectory() &&
+          fs.existsSync(path.join(notesRoot, entry.name, "index.mdx")),
+      )
+      .map((entry) => ({ label: entry.name, href: `/notes/${entry.name}` }))
+      .sort((a, b) => a.label.localeCompare(b.label, "zh-CN"))
+  : [];
+
+const navItems = [
+  { label: "笔记", href: "/notes" },
+  ...domainTabs,
+  { label: "日志", href: "/log" },
+  { label: "练习", href: "/projects" },
+  { label: "关于", href: "/meta" },
+];
+
+// The longest matching href wins, so a domain tab is active instead of
+// the generic "笔记" tab.
+const activeHref = navItems
+  .filter(
+    (item) =>
+      currentSlug === item.href || currentSlug.startsWith(`${item.href}/`),
+  )
+  .sort((a, b) => b.href.length - a.href.length)[0]?.href;
+
+const sections: SidebarSection[] = navItems.map((item) => ({
+  ...item,
+  isActive: item.href === activeHref,
+}));
+const showSections = sections.length >= 2;
+const homeHref = withBase("/", import.meta.env.BASE_URL);
+const resolveSectionHref = (href: string): string =>
+  withBase(href, import.meta.env.BASE_URL);
+---
+
+<header class="sticky top-0 z-30 border-b border-border bg-card/80 backdrop-blur-lg">
+  <div class="mx-auto flex items-center justify-between gap-3 h-14 px-4 lg:px-6">
+    <div class="flex items-center gap-3 min-w-0">
+      <slot name="brand">
+        {/* The mark alone; the site title stays as the link's accessible name. */}
+        <a href={homeHref} class="flex shrink-0 items-center text-foreground transition-opacity hover:opacity-70">
+          <Logo class="h-5 w-8 shrink-0" />
+          <span class="sr-only">{config.title}</span>
+        </a>
+      </slot>
+
+      {showSections && (
+        <nav aria-label="Sections" class="hidden md:flex items-center gap-1 ms-4 ps-4 border-s border-border h-6 min-w-0 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          {sections.map((section) => (
+            <a
+              href={resolveSectionHref(section.href)}
+              aria-current={section.isActive ? "page" : undefined}
+              class:list={[
+                "px-2 py-1 rounded-md text-[0.8125rem] font-medium no-underline transition-colors shrink-0 whitespace-nowrap",
+                section.isActive
+                  ? "text-foreground bg-accent"
+                  : "text-muted-foreground hover:text-foreground hover:bg-accent/60",
+              ]}
+            >
+              {section.label}
+            </a>
+          ))}
+        </nav>
+      )}
+    </div>
+
+    <div class="flex items-center gap-2 shrink-0">
+      <slot name="actions" />
+      {config.search !== false && <SearchTrigger />}
+      {config.github && (
+        <LinkButton
+          href={config.github}
+          variant="minimal"
+          shape="square"
+          size="sm"
+          aria-label="GitHub"
+          target="_blank"
+          rel="noopener"
+          class="text-muted-foreground"
+        >
+          <Icon name="ph:github-logo" class="w-4 h-4" />
+        </LinkButton>
+      )}
+      <ThemeToggle />
+      {showSidebar && (
+        <Button
+          variant="ghost"
+          shape="square"
+          size="sm"
+          icon="ph:list"
+          aria-label="Open navigation"
+          data-menu-btn
+          class="md:hidden text-muted-foreground"
+        />
+      )}
+    </div>
+  </div>
+  {/* Phones: the tabs on a row of their own under the bar. */}
+  {showSections && (
+    <nav aria-label="Sections" data-nb-header-tabs class="md:hidden flex items-center gap-1 h-10 px-4 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      {sections.map((section) => (
+        <a
+          href={resolveSectionHref(section.href)}
+          aria-current={section.isActive ? "page" : undefined}
+          class:list={[
+            "px-2 py-1 rounded-md text-[0.8125rem] font-medium no-underline transition-colors shrink-0 whitespace-nowrap",
+            section.isActive
+              ? "text-foreground bg-accent"
+              : "text-muted-foreground hover:text-foreground hover:bg-accent/60",
+          ]}
+        >
+          {section.label}
+        </a>
+      ))}
+    </nav>
+  )}
+</header>

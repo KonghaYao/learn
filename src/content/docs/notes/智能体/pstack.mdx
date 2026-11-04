@@ -1,0 +1,78 @@
+---
+title: pstack
+description: Poteto 的 Agent 工程 skills：一个入口、23 个 playbook、24 条原则，用真实产物和并行约束 AI 写代码。
+date: 2026-11-04
+tags: [AI, Agent, skills, pstack]
+status: growing
+sidebar:
+  order: 10
+---
+
+## 定位
+
+pstack 是 Poteto 维护的一套 Agent Skills，关注 Agent 提速后的代码质量与可验证性，不追求产量。作者在 Meta、Netflix、Cursor 工作，他把“AI 写太多 slop”视为主要风险；slop 指看似完整、实际无价值的代码。README 的原话是 “throughput without quality is not a goal i aspire to”，解法压成一句 “if you want to go fast, go deep first”。仓库是 `cursor/plugins/pstack` 的独立镜像，MIT 许可，可用 `npx skills add backnotprop/pstack` 安装，也可在 Claude Code 里从 `cursor/plugins` 市场安装。
+
+## 组成
+
+截至 2026-11-03（commit `ecec42ad`），仓库含 58 个 `SKILL.md`、23 个 playbook（预设流程）、24 条原则和 2 个 subagent，分五层：
+
+1. **入口 `poteto-mode`**：读取任务、匹配 playbook、把 playbook 步骤原文拷进 todo、按步骤路由到对应 skill，并规定回复文风与证据要求。
+2. **playbook**：一类任务的完整流程，覆盖 investigation、bug fix、perf、hillclimb、runtime forensics、trace forensics、feature、refactoring、prototype、visual parity、eval、babysit、shipping、autonomous run、orchestrate、autopilot、session pickup、multi-phase plan、worktree cleanup、opening a PR 等 23 种。
+3. **skill**：可单独调用的能力，如 `how`（子系统讲解）、`why`（决策考古）、`architect`（跨边界设计）、`arena`（多方案比拼）、`swarm`（并行分片）、`interrogate`（多模型对抗审查）、`tdd`、`unslop`（去 AI 腔）、`technical-writing`。
+4. **原则**：24 条跨任务规则，分 core 10 条、architecture 6 条、verification 5 条、delegation 2 条、meta 1 条。
+5. **subagent**：`poteto-agent` 承接 playbook 内的具体执行，`comment-sicko` 做只读评论审查。
+
+## 运行机制
+
+`poteto-mode` 在写代码前先用自己的话复述目标、问题和预期的最小改动，不等确认；随后匹配 playbook，把步骤原文写进 todo，跳过的步骤保留并标 `skip: <原因>`。每个 playbook 以统一格式的回复收尾，PR 链接写成完整 URL，各 playbook 只补充自己特有的内容。subagent 默认后台运行，brief 必须自带目标、范围、验证方式和输出格式；代码、判断与散文按角色分配模型，默认代码用 grok、判断与散文用 opus，`/setup-pstack` 把映射写入 rules 文件。换 harness 时按映射表替换 Task/Agent、模型名和 skill 目录，Cursor 专属能力（cloud agent、bugbot、automations）缺失时跳过并注明。
+
+这套“复述 → playbook → todo → 证据”的结构，把一次聊天变成可审计的执行记录，也是它区别于普通 prompt 集合的地方。
+
+## 核心原则
+
+1. **对真实产物验证。** “Verify every task output by checking the real thing directly.” 不看缓存截图、Agent 自述或“it compiles”；能写脚本就写脚本，脚本要能被审查者重跑。验证失败时先怀疑观察方法，再怀疑系统。
+2. **按可验证单元推进。** 每个单元是“已知好状态 → 一次改动 → 检查”的括号，不绿不进入下一个；提交与 PR 也按证明顺序排列，失败测试在前、修复在后。
+3. **可逆则前进，不可逆才停。** 默认不阻塞等人：写代码、改笔记、拆任务直接做，做完再让人纠正；强推共享分支、部署、删数据、给客户发消息必须先确认。
+4. **并行前先分上下文。** 批量输出交给 subagent，主线程只留摘要；`swarm` 按分片或竞速扇出，`arena` 做方案比拼，`autopilot` 每个 PR 一个 owner。
+5. **先减后加，先定数据形状再写逻辑。** Laziness Protocol 要求最小 diff 和单一决策源；Model the Domain 要求用状态机、类型、表或 reducer 承载领域，避免散落的条件分支；Fix Root Causes 要求追到系统第一次出错的位置。
+6. **数字必须解释。** 报告加速、回归、吞吐或 eval 结果前，先找限制因素，排除“测到的不是你以为的工作”；没有解释的数字不得进入结论。
+7. **把教训写进结构。** 同一条指令写第二遍时，改成 lint、元数据、运行时检查或脚本，避免再加一段文字。
+
+## Anti-pattern
+
+- **先写大计划。** 作者明确说 “the best spec is code”，pstack 不提供计划类 skill，计划模式交还给 harness。
+- **注释噪音。** 只保留代码无法表达的“为什么”；验证脚本不写 “Phase 1: add cards” 这类过程注释，用断言或日志字符串记录步骤。
+- **讨好用户。** “No is an acceptable answer”；推荐是判断，不是背书，同意不是默认。
+- **把绿灯当安全。** “Green is not safe”；shipping 前每个 PR 由未写该代码的 Agent 独立跑一遍用户路径，只有连续通过验证的一段才能从底部向上合并，CI 绿和 bot approve 都不算判定。
+- **用 Agent 自述代替证据。** 每个 claim 必须在同一句里标明 measured、inferred 或 guess，预测和未观察到的原因都算 guess。
+
+## 任务路由
+
+| 任务 | playbook | 关键动作 |
+|---|---|---|
+| 只读问题 | investigation | 走 `how`/`why`，产出带引用的解释，不改代码 |
+| 缺陷 | bug fix | 自己复现 → 二分定位 → 最小修复 → 同表面复验 |
+| 性能 | perf / hillclimb | 基线 → trace → 单变量改进 → 前后对比 |
+| 新功能 | feature | `how` → `architect` → 四格吞吐检查 → subagent 实现 → 表面验证 |
+| 并行覆盖 | swarm | 声明 done predicate → 分片或竞速 → 聚合 `PASS`/`ISSUES`/`BLOCKED` |
+| 合并 | shipping | 逐 PR 独立判定 → 取连续验证段 → 自底向上合并 |
+
+以“列表页偶发卡顿”为例：匹配 perf 后先测基线，再用 profile 取证；假设按二分法排除，存活的机制必须由运行时证据确认；修复后在同一表面复跑原复现；提交按“失败复现在前、修复在后”排列；回复给出原因、改动和验证输出，不要只写“已优化”。
+
+## 代价与边界
+
+- **Cursor 原生。** 其他 harness 需要读映射表，部分能力直接缺失；没有 subagent 工具的 harness 只能串行执行。
+- **流程重。** 小改动也要开 todo、走 playbook；作者把计划排除在外，但执行侧的前置动作并不少。
+- **模型敏感。** 效果依赖模型清单、推理档位和 fast/standard 切换；模型名失效时要降级并说明。
+- **证据等级低。** 这是一份实践者规范，没有对照实验；3.5k stars 只说明关注度。
+- **适合长任务。** 过夜运行、PR 栈、性能取证、需要并行覆盖的仓库收益最大；一行修改、需求探索、没有可运行产物的仓库不值得引入。
+
+## 事实源
+
+以下内容读自仓库原文（✅）：[README](https://github.com/backnotprop/pstack)、[`poteto-mode`](https://github.com/backnotprop/pstack/blob/ecec42adbe4f240e4ae19d296768445f0dfbd38e/skills/poteto-mode/SKILL.md)、[`principle-prove-it-works`](https://github.com/backnotprop/pstack/blob/ecec42adbe4f240e4ae19d296768445f0dfbd38e/skills/principle-prove-it-works/SKILL.md)、[`principle-sequence-verifiable-units`](https://github.com/backnotprop/pstack/blob/ecec42adbe4f240e4ae19d296768445f0dfbd38e/skills/principle-sequence-verifiable-units/SKILL.md)、[`principle-never-block-on-the-human`](https://github.com/backnotprop/pstack/blob/ecec42adbe4f240e4ae19d296768445f0dfbd38e/skills/principle-never-block-on-the-human/SKILL.md)、[`principle-guard-the-context-window`](https://github.com/backnotprop/pstack/blob/ecec42adbe4f240e4ae19d296768445f0dfbd38e/skills/principle-guard-the-context-window/SKILL.md)、[`bug fix`](https://github.com/backnotprop/pstack/blob/ecec42adbe4f240e4ae19d296768445f0dfbd38e/skills/poteto-mode/playbooks/bug-fix.md)、[`shipping`](https://github.com/backnotprop/pstack/blob/ecec42adbe4f240e4ae19d296768445f0dfbd38e/skills/poteto-mode/playbooks/shipping.md)。引语逐字来自上述文件；star 数截至 2026-11-04。这是工具笔记，不做研究证据分级。
+
+## 相关
+
+- [Matt Pocock 的 skills](/notes/智能体/matt-skills)
+- [两套 Agent Skills 对比](/notes/智能体/两套-agent-skills-对比)
+- [智能体总览](/notes/智能体)
