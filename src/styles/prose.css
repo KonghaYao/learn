@@ -215,6 +215,82 @@
   border-radius: 0;
 }
 
+/* Mermaid diagrams — authored fences become <pre class="mermaid"> and Pele
+   swaps in an SVG. Diagram colours come from --pele-* variables, so the
+   light/dark switch recolours them without a re-render. Until the runtime
+   loads, the source stays readable rather than looking like highlighted code. */
+.docs-content :where(pre.mermaid) {
+  --pele-bg: var(--nb-background);
+  --pele-fg: var(--nb-foreground);
+  --pele-muted: var(--nb-muted-foreground);
+  --pele-line: var(--nb-muted-foreground);
+  --pele-surface: var(--nb-card);
+  --pele-surface-alt: var(--nb-muted);
+  --pele-border: var(--nb-border-strong);
+  --pele-accent: var(--nb-foreground);
+  --pele-font: var(--nb-font-sans);
+  --pele-font-mono: var(--nb-font-mono);
+  --pele-radius: var(--nb-radius);
+  margin: 1.5rem 0;
+  padding: 1rem;
+  overflow-x: auto;
+  background: transparent;
+  border: 1px solid var(--nb-border);
+  border-radius: var(--nb-radius);
+  font-family: var(--nb-font-sans);
+  font-size: 0.875rem;
+  line-height: 1.5rem;
+  color: var(--nb-muted-foreground);
+  text-align: center;
+}
+
+.docs-content :where(pre.mermaid[data-processed]) {
+  color: var(--nb-foreground);
+  white-space: normal;
+}
+
+.docs-content :where(pre.mermaid[data-error]) {
+  color: var(--nb-muted-foreground);
+  white-space: pre-wrap;
+  text-align: left;
+}
+
+.docs-content :where(pre.mermaid svg) {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin-inline: auto;
+}
+
+/* PlantUML diagrams — same build-time container, rendered by the TeaVM
+   runtime in the browser. The wrapper scrolls horizontally instead of
+   overflowing the prose column. */
+.docs-content :where(pre.plantuml) {
+  margin: 1.5rem 0;
+  padding: 1rem;
+  overflow-x: auto;
+  background: transparent;
+  border: 1px solid var(--nb-border);
+  border-radius: var(--nb-radius);
+  font-family: var(--nb-font-sans);
+  font-size: 0.875rem;
+  line-height: 1.5rem;
+  color: var(--nb-muted-foreground);
+  text-align: center;
+}
+
+.docs-content :where(pre.plantuml[data-processed]) {
+  color: var(--nb-foreground);
+  white-space: normal;
+}
+
+.docs-content :where(pre.plantuml svg) {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin-inline: auto;
+}
+
 /* Tables: 14/20 cells on a 41px row, an unfilled header in secondary text,
    and lines only between rows. Fills its column; scroll is owned by the
    `.nb-table-scroll` wrapper (injected by the tableScroll() hast plugin),

@@ -89,6 +89,48 @@ README 用一个例子说明收益：改前是“一门课里的一节课被‘�
 | 跨会话目标 | `wayfinder` | 可续跑的大任务 |
 | 交接 | `handoff` | 给下一个会话的上下文 |
 
+## 场景与工作流
+
+失败模式表给根因，任务路由表给匹配；下面三张图给出分流、诊断和交付步骤。
+
+```mermaid
+flowchart TB
+  S[处境] --> D{哪类失败}
+  D -->|Agent 没做对| G[grill-me / grill-with-docs]
+  D -->|Agent 话太多| L[domain-modeling + GLOSSARY.md]
+  D -->|代码不工作| T[tdd / diagnosing-bugs]
+  D -->|代码变泥球| A[codebase-design / improve-codebase-architecture]
+```
+
+图 1：先按失败现象分流，再进入对应 skill。
+
+```mermaid
+flowchart TB
+  subgraph BUG[硬 bug 或性能回归]
+    B1[造能变红的循环] --> B2[最小化复现] --> B3[排序 3–5 个假设] --> B4[埋点验证] --> B5[修复] --> B6[补回归测试]
+  end
+
+  subgraph ARCH[代码变泥球]
+    A1[定范围] --> A2[git log 找热点] --> A3[subagent 扫描] --> A4[HTML 候选报告] --> A5[用户选中] --> A6[grilling 定命名、约束与接缝]
+  end
+```
+
+图 2：两类诊断流程。造不出循环时停下，先要环境或脱敏产物。
+
+```mermaid
+flowchart LR
+  G[grill-me / grill-with-docs] --> S[to-spec]
+  G -.-> D[GLOSSARY.md + ADR]
+  S --> T[to-tickets<br/>曳光弹 + 阻塞边]
+  T --> I[implement<br/>按接缝写 TDD]
+  I --> C[code-review<br/>Standards + Spec]
+  T --> P[implement-spec<br/>集成分支 + 任务图]
+  P --> C
+  W[wayfinder<br/>跨会话目标] -.-> T
+```
+
+图 3：交付链。`to-tickets` 的工单带阻塞边，`implement-spec` 只调度阻塞边已完成的工单。
+
 ## 事实源
 
 以下内容读自仓库原文（✅）：[README](https://github.com/mattpocock/skills)、[`grilling`](https://github.com/mattpocock/skills/blob/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/productivity/grilling/SKILL.md)、[`tdd`](https://github.com/mattpocock/skills/blob/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/engineering/tdd/SKILL.md)、[`diagnosing-bugs`](https://github.com/mattpocock/skills/blob/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/engineering/diagnosing-bugs/SKILL.md)、[`domain-modeling`](https://github.com/mattpocock/skills/blob/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/engineering/domain-modeling/SKILL.md)、[`codebase-design`](https://github.com/mattpocock/skills/blob/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/engineering/codebase-design/SKILL.md)、[`to-tickets`](https://github.com/mattpocock/skills/blob/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/engineering/to-tickets/SKILL.md)、[`improve-codebase-architecture`](https://github.com/mattpocock/skills/blob/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/engineering/improve-codebase-architecture/SKILL.md)、[`writing-for-agents`](https://github.com/mattpocock/skills/blob/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/productivity/writing-for-agents/SKILL.md)。引语逐字来自上述文件；star 数截至 2026-11-04。这是工具笔记，不做研究证据分级。

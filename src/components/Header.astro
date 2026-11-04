@@ -40,8 +40,9 @@ const currentSlug =
 // Top navigation for the learning areas.
 // Nimbus's built-in tabs only appear for separate collections; this site
 // uses one docs collection, so the tabs are defined here.
-// Domain tabs are read from notes/<domain>/index.mdx, so new domains
-// appear automatically when they are created.
+// Each notes domain is its own top-level tab, read from
+// notes/<domain>/index.mdx, so new domains appear automatically.
+// There is no umbrella "notes" tab.
 const notesRoot = path.join(process.cwd(), "src/content/docs/notes");
 const domainTabs = fs.existsSync(notesRoot)
   ? fs
@@ -56,15 +57,13 @@ const domainTabs = fs.existsSync(notesRoot)
   : [];
 
 const navItems = [
-  { label: "笔记", href: "/notes" },
   ...domainTabs,
   { label: "日志", href: "/log" },
   { label: "练习", href: "/projects" },
   { label: "关于", href: "/meta" },
 ];
 
-// The longest matching href wins, so a domain tab is active instead of
-// the generic "笔记" tab.
+// The longest matching href wins, so nested pages light up their domain.
 const activeHref = navItems
   .filter(
     (item) =>

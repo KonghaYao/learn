@@ -21,6 +21,16 @@ sidebar:
 - 建了术语与译名表，修正 feedback loop、deep module、frontier 的译名。
 - 读了 Alibaba Style Guide，采用它的六条 Golden Rules 作基础风格指南。
 - 补查国内厂商规范：阿里没有公开的中文术语对照表；华为 OpenHarmony 有中文风格指南和术语表；蚂蚁 Ant Design 有中文文案规则；腾讯、字节、美团没有找到可核验的公开规范。
+- 定了知识体系的四层：原文（URL）→ 深度学习文摘 → 提炼 → 领域知识。
+- 按四层提炼 pstack 和 Matt 两篇，写了 Agent Skills；随后撤下，改为先深挖场景与工作流。
+- 给 pstack 补了 2 张工作流图，给 Matt 补了 3 张；领域知识 tab 暂不保留。
+- 顶栏去掉「笔记」「方法」两个 tab 及内容；根路径改跳 `/notes/智能体`；顶栏只剩领域、日志、练习、关于。
+- 接入 PlantUML：`plantuml` 围栏按需渲染，支持中文和明暗主题。
+- 官方 Mermaid 换成 Pele：包更小，颜色由 CSS 变量控制，主题切换不用重绘。
+- 建立 better-draw skill：按「关系类型 → 场景 → 关键字」选图，附 32 类 Pele 示例链接。
+- pstack 六张工作流图改用 swimlane-beta：三列泳道，人、Agent、产物分开。
+- 把 pstack 的「场景与工作流」展开成六个 playbook，每个一张人 / Agent / 产物流程图。
+- 修了 Mermaid 多图渲染的 id 冲突：同一毫秒启动的图只剩第一张有内容。
 
 ## 用我自己的话讲
 
@@ -40,7 +50,6 @@ sidebar:
 
 ## 今天新增的页面
 
-- [笔记总览](/notes)
 - [练习总览](/projects)
 - [关于这个库](/meta)
 - [写作与整理规范](/meta/conventions)

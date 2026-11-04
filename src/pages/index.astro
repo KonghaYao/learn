@@ -1,17 +1,21 @@
 ---
-// 没有单独的首页：根路径直接去笔记。
+import { withBase } from "@cloudflare/nimbus-docs/runtime";
+
+// 没有单独的首页：根路径直接去第一个领域。
 // 用完整 HTML 页面而不是裸 meta refresh，避免构建工具报“缺少 <html>”。
+const notesPath = withBase("/notes/智能体", import.meta.env.BASE_URL);
+const notesUrl = Astro.site ? new URL(notesPath, Astro.site).href : notesPath;
 ---
 
 <html lang="zh-CN">
   <head>
     <meta charset="utf-8" />
-    <meta http-equiv="refresh" content="0; url=/notes" />
-    <link rel="canonical" href="/notes" />
+    <meta http-equiv="refresh" content={`0; url=${notesPath}`} />
+    <link rel="canonical" href={notesUrl} />
     <meta name="robots" content="noindex" />
-    <title>前往笔记</title>
+    <title>前往智能体</title>
   </head>
   <body data-pagefind-ignore>
-    <p><a href="/notes">前往笔记</a></p>
+    <p><a href={notesPath}>前往智能体</a></p>
   </body>
 </html>

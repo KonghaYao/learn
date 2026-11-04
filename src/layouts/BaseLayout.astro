@@ -150,8 +150,12 @@ const resolvedMarkdownUrl =
 
     <script>
       import { codeCopy, headingAnchors } from "@cloudflare/nimbus-docs/client";
+      import { initMermaid } from "@/components/mermaid.client";
+      import { initPlantuml } from "@/components/plantuml.client";
       codeCopy();
       headingAnchors();
+      initMermaid();
+      initPlantuml();
     </script>
   </body>
 </html>

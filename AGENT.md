@@ -148,6 +148,21 @@ End with `Summary: N errors, N warnings.`
 - **Search** — `data-pagefind-body` is on the docs main wrapper; after a production build, `dist/pagefind/` exists with ≥1 indexed page.
 - **Cloudflare** (if applicable) — `wrangler.jsonc` has `name` and `compatibility_date`. Static output: `assets.directory = "./dist"` and `assets.not_found_handling = "404-page"`. Server output (`@astrojs/cloudflare`): no `assets.directory` or `main`; the adapter writes the deploy config to `dist/server/wrangler.json` at build time, so check that file after a build.
 
+## Dev server and build cache
+
+- The dev server and `astro build` share `node_modules/.vite`. Running a build while the dev server is active can evict optimized deps. The diagram runtime then fails with `504 Outdated Optimize Dep`, and the page shows raw diagram source.
+- Fix: stop the dev server, remove `node_modules/.vite`, restart. Diagram runtimes are prebundled through `optimizeDeps.include` in `astro.config.ts`.
+- After any production build, restart the dev server before previewing pages.
+
+## Diagrams
+
+- `mermaidBlocks()` and `plantumlBlocks()` (mdast stage) turn fences into `<pre class="mermaid">` / `<pre class="plantuml">` before Shiki sees them. Client modules replace the source with an SVG.
+- `mermaid` fences are rendered by Pele (`pele`), not the official Mermaid package. Pele emits SVG that reads `--pele-*` CSS variables, so light/dark switches recolour diagrams without a re-render. The variables are mapped to `--nb-*` tokens in `src/styles/prose.css`.
+- Both runtimes load lazily. A page without diagrams downloads neither. Keep new diagram types on the same pattern.
+- PlantUML uses `@plantuml/core` (TeaVM, no Java). `viz-global.js` is a UMD: the client resolves its default export or `globalThis.Viz` and sets `globalThis.PLANTUML_VIZ` before importing `plantuml.js`.
+- `optimizeDeps.include` lists `pele`, `@plantuml/core/plantuml.js`, and `@plantuml/core/viz-global.js`. A new client-only runtime needs the same entry or dev serves 504 after a build.
+- PlantUML blocks without `@startuml` are wrapped at build time, so notes can use bare statements.
+
 ## Don't
 
 - Hand-add components under `src/components/ui/` that exists in the Nimbus registry — use `npx @cloudflare/nimbus-docs add <slug>` so deps resolve.

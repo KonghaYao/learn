@@ -45,6 +45,21 @@ sidebar:
 | 2026-11-04 | worktree 不译 | 用户指出特指 git worktree | `meta/glossary.mdx`、`CLAUDE.md`、`meta/conventions.mdx` |
 | 2026-11-04 | 采用 Alibaba Style Guide 作基础风格指南 | 用户指定 | `meta/style-base.mdx`、`meta/conventions.mdx`、`meta/index.mdx`、`CLAUDE.md` |
 | 2026-11-04 | 补查国内厂商规范 | 用户追问阿里术语表有无中文版，并要求继续检索 | `meta/style-base.mdx`、`meta/glossary.mdx` |
+| 2026-11-04 | 建立四层知识体系 | 用户要求：原文（URL）→ 深度学习文摘 → 提炼 → 领域知识 | `CLAUDE.md`、`meta/conventions.mdx` |
+| 2026-11-04 | 领域知识独立成顶层 tab | 用户要求不要混在主题里 | `notes/领域知识/`、`notes/智能体/`、`notes/index.mdx` |
+| 2026-11-04 | 撤下领域知识 tab | 用户要求先深挖两套工作流 | `notes/智能体/`、`notes/领域知识/` |
+| 2026-11-04 | 删除「笔记」「方法」两个顶层 tab 及内容 | 用户要求顶栏只留真正的领域 | `Header.astro`、`index.astro`、`notes/index.mdx`、`notes/方法/`、相关链接 |
+| 2026-11-04 | 场景与工作流展开为六个 playbook | 用户要求写清人、Agent、产物 | `notes/智能体/pstack.mdx` |
+| 2026-11-04 | 修复多图渲染为空 SVG | 同一毫秒渲染时 Mermaid 的 DOM id 冲突 | `src/components/mermaid.client.ts`、`AGENT.md` |
+| 2026-11-04 | 放弃 eventmodeling 图 | 该类型只接受 ASCII 标识符，中文标签直接报错 | 临时改动已撤回，未留文件 |
+| 2026-11-04 | 接入 PlantUML | 部分图形 Mermaid 布局不理想；选用纯 JS 版 @plantuml/core | `src/lib/plantuml-mdast.ts`、`src/components/plantuml.client.ts`、`astro.config.ts` |
+| 2026-11-04 | 用 Pele 替换官方 Mermaid 渲染器 | 更快、更小；颜色走 CSS 变量，主题切换不重绘 | `src/components/mermaid.client.ts`、`astro.config.ts`、`package.json` |
+| 2026-11-04 | 建立 better-draw skill | 把「文章表达转图」的方法固化成技能 | `.claude/skills/better-draw/SKILL.md` |
+| 2026-11-04 | pstack 六张工作流图改用 swimlane | 泳道把「人 / Agent / 产物」分列，宽度更容易控制 | `notes/智能体/pstack.mdx` |
+| 2026-11-04 | 禁用电报体：一句一个动作、主语不中途消失、不造名词 | 用户指出 pstack 文词垃圾 | `CLAUDE.md`、`meta/conventions.mdx`、`notes/智能体/pstack.mdx` |
+| 2026-11-04 | `CLAUDE.md` 加「场景 → 图型」速查表 | 用户要画图时能一眼查到 Pele 图型 | `CLAUDE.md` |
+| 2026-11-04 | 有图就减少过程描述 | 用户指出正文重复重述泳道图步骤 | `CLAUDE.md`、`meta/conventions.mdx`、`notes/智能体/pstack.mdx` |
+| 2026-11-04 | 部署改为 GitHub Pages | 用户要求配置 GitHub Pages 与 Action 自动发布 | astro.config.ts、.github/workflows/deploy.yml、public/.nojekyll、README.md |
 
 ## 当前工作方式
 
@@ -54,8 +69,8 @@ sidebar:
 
 ## 待确认
 
-- 正式域名。
-- 是否部署到 Cloudflare。
+- 是否绑定自定义域名。
+- 是否保留 Cloudflare 部署（当前 base 固定为 /learn）。
 - 是否以后接入评论、搜索或 MCP。
 
 ## 相关

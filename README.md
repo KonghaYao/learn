@@ -23,7 +23,14 @@ npm run dev
 | `npm run preview` | 预览构建结果 |
 | `npm run lint:docs` | 检查内容 |
 | `npm run typecheck` | 检查类型 |
-| `npm run deploy` | 部署到 Cloudflare |
+| `npm run deploy` | 部署到 Cloudflare（可选） |
+
+## 部署
+
+推送到 `main` 后，GitHub Actions 自动发布。
+
+- 站点地址：https://konghaoyao.github.io/learn/
+- 本地预览：http://localhost:4321/learn/
 
 ## 目录
 

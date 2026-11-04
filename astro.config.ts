@@ -4,11 +4,13 @@ import nimbus, {
   defineConfig as defineNimbusConfig,
 } from "@cloudflare/nimbus-docs";
 import { tableScroll } from "@cloudflare/nimbus-docs/markdown";
+import { mermaidBlocks } from "./src/lib/mermaid-mdast";
+import { plantumlBlocks } from "./src/lib/plantuml-mdast";
 
 const nimbusConfig = defineNimbusConfig({
-  // CHANGE_ME: 部署后的正式域名（不要结尾斜杠）。
+  // 正式部署地址（不要结尾斜杠）。
   // 它会影响 canonical、OG 图片、robots.txt、sitemap 和 llms.txt。
-  site: "https://learn.example.com",
+  site: "https://konghaoyao.github.io",
   title: "我的学习库",
   description: "一个阅读友好的个人学习库。先记下来，再慢慢整理。",
   locale: "zh-CN",
@@ -29,11 +31,24 @@ const nimbusConfig = defineNimbusConfig({
 export default defineConfig({
   // nimbus:adapter
   output: "static",
+  // GitHub Pages 项目站点部署在 `/learn` 子路径。
+  base: "/learn",
   // Tailwind v4 via its Vite plugin (the integration Astro recommends for
   // Tailwind v4 — replaces the PostCSS plugin, which doesn't build under
   // Astro 7's Vite 8 bundler).
   vite: {
     plugins: [tailwindcss()],
+    // Prebundle the diagram runtimes in dev. The clients import them lazily,
+    // so without this the first request can hit "504 Outdated Optimize Dep"
+    // after a cache reset (for example, a production build sharing
+    // node_modules/.vite).
+    optimizeDeps: {
+      include: [
+        "pele",
+        "@plantuml/core/plantuml.js",
+        "@plantuml/core/viz-global.js",
+      ],
+    },
   },
   // Hover-prefetch link targets so full-page navigations feel instant without
   // a client-side router.
@@ -54,6 +69,9 @@ export default defineConfig({
         "nimbus/internal-link": "error",
       },
       markdown: {
+        // Turn ```mermaid / ```plantuml fences into plain containers before
+        // Shiki runs; the client scripts render the SVG on demand.
+        mdastPlugins: [mermaidBlocks(), plantumlBlocks()],
         // Wrap wide tables so they scroll instead of overflowing the page
         // (styled by `.nb-table-scroll` in src/styles/prose.css).
         hastPlugins: [tableScroll()],
