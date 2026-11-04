@@ -295,11 +295,12 @@ status: seed
 
 ### 文风
 
-底座：`meta/style-base.mdx`（Alibaba Style Guide 的六条 Golden Rules）。
+底座：`meta/style-base.mdx`。六条原则按 ISO 24495-1:2023、GOV.UK 写作规范、美国 Federal Plain Language Guidelines 组织；阿里的 Style Guide 只作旁证。
 执行细则：`meta/conventions.mdx` 第 9 节。
 
-依据：ISO 24495-1:2023、GOV.UK 写作规范、美国 Federal Plain Language Guidelines。
-中文细则：`meta/style-base.mdx` 的 OpenHarmony 一节（术语一致、行话与成语、术语写法）。
+依据与逐字引语：`meta/evidence.mdx` 第 2 节。
+中文细则：`meta/style-base.mdx` 的「中文细则」一节。
+国内厂商规范：`meta/glossary-vendors.mdx`，只作旁证。
 
 这些是规范，不是实验，标 `[中]`。
 中文只有余光中的评论文章可引，标 `[有限]`。

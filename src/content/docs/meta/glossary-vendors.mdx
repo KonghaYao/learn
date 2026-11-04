@@ -1,0 +1,93 @@
+---
+title: 国内厂商写作规范
+description: 阿里、华为、蚂蚁等厂商公开的中文写作规范与术语表，以及它们能支撑什么。
+date: 2026-11-04
+tags: [术语, 翻译, 写作, 证据]
+status: growing
+sidebar:
+  order: 27
+---
+
+## 这页是什么
+
+这页收的是检索过程，不是规则。[术语与译名表](/meta/glossary)只引用结论，过程留在这里。
+
+读法：先看每节的「能支撑什么」，需要逐字核对时再点来源。
+
+## 阿里：没有公开的中文对照表
+
+- 阿里云术语库：`https://developer.aliyun.com/group/alibabacloudterm`，页面自述「提供术语的标准定义、缩略语、术语用法及多语言等」。
+- 公开形态是社区小组的文章流，按领域发布「必知词汇」词条，覆盖 Linux、数据库、云原生、微服务、Java、Python、前端、k8s。
+- 词条有中文释义和英文全称，例：`操作系统（Operating system，OS）`。
+- 没有中英对照表、导出文件或版本号；正文是科普长文，附参考资料。
+- 《Alibaba Style Guide》（2018，EN→ID，VER 1.0）只有英文版，面向印尼语，本库只见到图书预览页的前几页。
+
+能支撑什么：术语「中英并列」的写法形状。
+不能支撑什么：具体译名。缺可引用的对照表，本库不把词条文章当依据。
+
+## 华为 / OpenHarmony：有中文规范
+
+《OpenHarmony 开发者文档风格指南》是中文原文，分【规则】和【建议】两级。术语表在 `zh-cn/glossary.md`，按字母排列，条目形如 `ArkCompiler；方舟编译器`。
+
+三条术语规则，逐字引用：
+
+> 术语/缩略语名称要同“OpenHarmony术语表”保持一致，且全文统一。
+
+> 对于“OpenHarmony术语表”中未涵盖的行业通用术语/缩略语（如IP，MAC等），要同国际、国家、行业标准中的名称保持一致。
+
+> 禁止随意缩写英文单词，自创缩略语。
+
+另外两条来自术语表与 LiteOS 文档：
+
+- 术语名写法：`英文全称 (缩略语)；中文全称`。
+- LiteOS《文档写作规范》：「可以优先使用中文，建议中英文都支持……保证中英文的同步」；建议标题层级不超过三级。
+
+能支撑什么：术语一致、不自创缩略语、标题层级。本库第 4 条原则的来源就是这一条。
+
+## 蚂蚁 / Ant Design：有界面文案规则
+
+- 文案页为中文，有明确对照表：其他/其它、抱歉/对不起、验证码/校验码、登录/登陆、此/该。
+- 称呼：用「你」「我」，不用「您」；同一句不混用。
+
+能支撑什么：常用词对照、称呼规则。
+局限：管界面文案，不覆盖技术文档和翻译。
+
+## 本库采用的中文用词
+
+| 用 | 不用 | 来源 |
+|---|---|---|
+| 登录 | 登陆 | OpenHarmony、Ant Design |
+| 其他 | 其它 | Ant Design |
+| 阈值 | 阀值 | OpenHarmony |
+| 图像 | 图象 | OpenHarmony |
+| 命令 | 指令 | OpenHarmony |
+
+## 没找到的
+
+- 腾讯、字节跳动、美团：没有可核验的公开翻译规范或写作规范。搜到的只有文库、招聘、转载，不能引用。
+- 这只说明本次检索的边界，不能推断这些公司内部没有规范。
+
+## 旁证怎么用
+
+三条：
+
+1. 厂商公开规范只作旁证，不覆盖用户指定。
+2. 只有用户指定能改通行译名。
+3. 拿到阿里的内部基准后，再加一列逐条对照，不凭印象补。
+
+## 来源
+
+- 阿里云术语库：`https://developer.aliyun.com/group/alibabacloudterm`
+- 阿里词条合集：`https://developer.aliyun.com/article/746093`
+- 阿里词条例：`https://developer.aliyun.com/article/745973`
+- OpenHarmony 语言风格：`https://gitcode.com/openharmony/docs/blob/master/zh-cn/contribute/style-guide/style-guide-language-style.md`
+- OpenHarmony 内容元素：`https://gitcode.com/openharmony/docs/blob/master/zh-cn/contribute/style-guide/style-guide-content-elements.md`
+- OpenHarmony 术语表：`https://gitcode.com/openharmony/docs/blob/master/zh-cn/glossary.md`
+- LiteOS 文档写作规范：`https://gitee.com/LiteOS/LiteOS/raw/master/doc/LiteOS_Contribute_Guide.md`
+- Ant Design 文案：`https://ant.design/docs/spec/copywriting-cn`
+
+## 相关
+
+- [术语与译名表](/meta/glossary)
+- [基础风格指南](/meta/style-base)
+- [证据页](/meta/evidence)
